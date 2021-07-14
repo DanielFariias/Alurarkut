@@ -2,7 +2,7 @@ import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function ProfileSidebar(props) {
   return (
@@ -20,6 +20,29 @@ function ProfileSidebar(props) {
   )
 }
 
+function ProfileRelationsBox(props) {
+  return (
+    <ProfileRelationsBoxWrapper>
+      <h2 className="smallTitle">
+        {props.title} ({props.items.length})
+      </h2>
+      <ul>
+        {props.items.map((itemAtual) => {
+          return (
+            <li key={itemAtual.id}>
+              <a href={`/users/${itemAtual.login}`}>
+                <img src={itemAtual.avatar_url} />
+                <span>{itemAtual.login}</span>
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </ProfileRelationsBoxWrapper>
+  )
+}
+
+
 export default function Home() {
   const userAtual = 'danielfariias';
   const pessoasFavoritas = [
@@ -35,6 +58,23 @@ export default function Home() {
     title: 'Eu odeio acordar cedo',
     image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
   }]);
+  const [seguidores, setSeguidores] = useState([])
+
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/DanielFariias/followers')
+      .then(respostaServidor => {
+        return respostaServidor.json()
+      })
+      .then(resCompleted => {
+        console.log(resCompleted)
+        setSeguidores(resCompleted)
+      })
+  }, [])
+
+
+
+
 
   return (
     <>
@@ -88,6 +128,7 @@ export default function Home() {
         </div>
 
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
+          <ProfileRelationsBox title="Seguidores" items={seguidores} />
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">
               Comunidades ({comunidades.length})
